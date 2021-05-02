@@ -6,6 +6,7 @@ const program = require("commander");
 const chalk = require("chalk");
 const options = require("./lib/options");
 const download_template = require("./lib/download_template");
+const download_file = require("./lib/download_file");
 
 
 program
@@ -16,7 +17,7 @@ program
 		typeof name !== 'string' && (console.log(chalk.red('请输入项目名称')), process.exit(1));
 		console.log(chalk.yellow('初始化模板 \n'));
 		const opts = await options();
-		await download_template(name, opts);
+		await download_file(name, opts);
 	});
 
 program.parse(process.argv);
