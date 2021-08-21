@@ -1,6 +1,6 @@
 {
   "name": "cli-ddd",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "cli-ddd",
   "main": "index.js",
   "scripts": {
