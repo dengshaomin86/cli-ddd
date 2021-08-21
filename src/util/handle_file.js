@@ -85,4 +85,6 @@ function move_project_file({ source, target, opts }) {
 module.exports = {
   delete_file,
   move_project_file,
+  handle_content,
+  get_file_type,
 };

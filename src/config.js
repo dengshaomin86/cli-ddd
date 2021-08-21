@@ -10,7 +10,7 @@ const templates = [
     name: 'vue_template_file',
     value: 'temp_02',
     type: 'file',
-    url: 'git@github.com:dengshaomin86/vue_template.git',
+    url: 'dengshaomin86/vue_template',
   },
 ];
 

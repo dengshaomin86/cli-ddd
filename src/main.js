@@ -8,7 +8,7 @@ const { log } = require('./util/log');
 const { version } = require('../package.json');
 const { templates } = require('./config');
 const { download_file } = require('./lib/download_file');
-// const download_template = require('./lib/download_template');
+const { download_template } = require('./lib/download_template');
 
 program
   .version(version)
@@ -37,6 +37,9 @@ program
     // 下载模板
     if (type === 'zip') {
       await download_file({ context, opts: { ...opts, name }, template });
+    }
+    if (type === 'file') {
+      download_template({ context, opts: { ...opts, name }, template });
     }
   });
 

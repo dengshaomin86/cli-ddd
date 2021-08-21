@@ -1,67 +1,58 @@
-// 下载配置的模板
-const downLoad = require('download-git-repo');
-// 下载动画
-const ora = require('ora');
-const chalk = require('chalk');
-const writeFileTree = require('../util/writeFileTree');
-const getPkg = require('../util/getPkg');
-const getMain = require('../util/getMain');
+const fs = require('fs');
 const path = require('path');
-const Handlebars = require('handlebars');
+const downloadGitRepo = require('download-git-repo'); // 下载配置的模板
+const ora = require('ora'); // 下载动画
+const { log } = require('../util/log');
+const { handle_content, get_file_type } = require('../util/handle_file');
 
-let urlObj = {
-  demo1: 'dengshaomin86/cli-demo1',
-  demo2: 'dengshaomin86/cli-demo2',
-  demo3: 'https://www.baidu.com/img/flexible/logo/pc/result.png',
-};
+function download_template({ context, opts, template }) {
+  const { name } = opts;
+  const { url } = template;
+  if (!url) return false;
 
-let download_template = (name, opts) => {
-  const { template, clientName } = opts;
-  const url = urlObj[template];
-  !url && (console.log(chalk.red('项目模板不存在\n')), process.exit(1));
-
-  const cwd = opts.cwd || process.cwd();
-  const context = path.resolve(cwd, name || '.');
-
-  console.log(context);
-
+  log.info('开始拉取模板');
   const spinner = ora('正在拉取模板...');
   spinner.start();
 
-  downLoad(
+  // 拉取模板
+  downloadGitRepo(
     url,
     name,
     {
       clone: false,
     },
     async (err) => {
-      let pkg_default = getPkg(context);
-
-      const pkg = {
-        ...pkg_default,
-        version: '1.0.0',
-        name,
-      };
-
-      // write package.json
-      await writeFileTree(context, {
-        'package.json': JSON.stringify(pkg, null, 2),
-      });
-
-      const main_default = getMain(context);
-      const template = Handlebars.compile(main_default);
-      const mainContent = template({ ClientName: clientName });
-
-      // write main.js
-      await writeFileTree(context, {
-        'main.js': mainContent,
-      });
-
       spinner.stop();
-      console.log(err ? err : '项目创建成功');
+      if (!err) {
+        log.success('拉取模板成功');
+        log.info('开始处理文件内容');
+        handle_file(context, opts);
+        log.success('创建成功');
+      } else {
+        log.error(err);
+      }
       process.exit(1);
     },
   );
-};
+}
 
-module.exports = download_template;
+// 处理文件内容
+function handle_file(context, opts) {
+  const files = fs.readdirSync(context);
+
+  for (const filename of files) {
+    const file_ctx = path.resolve(context, filename);
+    if (get_file_type(file_ctx) === 'directory') {
+      handle_file(file_ctx, opts);
+    } else {
+      // 替换模板字符串
+      const content = fs.readFileSync(file_ctx, 'utf-8');
+      const result = handle_content({ context: file_ctx, content, opts });
+      fs.writeFileSync(file_ctx, result);
+    }
+  }
+}
+
+module.exports = {
+  download_template,
+};
