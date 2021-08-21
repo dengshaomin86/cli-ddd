@@ -7,6 +7,10 @@ const zip_file = {
   filename: 'cli-demo1-master.zip',
 };
 
+// 文本替换模板
+const template_data = {};
+
 module.exports = {
   zip_file,
+  template_data,
 };

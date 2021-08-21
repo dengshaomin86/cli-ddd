@@ -30,7 +30,7 @@ program
     const opts = await options();
 
     // 下载模板
-    await download_file({ name, opts, context });
+    await download_file({ context, opts: { ...opts, name } });
   });
 
 program.parse(process.argv);
