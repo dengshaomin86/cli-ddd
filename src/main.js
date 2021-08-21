@@ -3,9 +3,10 @@
 const fs = require('fs');
 const path = require('path');
 const program = require('commander');
-const options = require('./lib/options');
+const options = require('./util/options');
 const { log } = require('./util/log');
 const { version } = require('../package.json');
+const { templates } = require('./config');
 const { download_file } = require('./lib/download_file');
 // const download_template = require('./lib/download_template');
 
@@ -28,9 +29,15 @@ program
 
     // 项目配置
     const opts = await options();
+    const { template_id } = opts;
+    const template = templates.find((item) => item.value === template_id);
+    if (!template) return false;
+    const { type } = template;
 
     // 下载模板
-    await download_file({ context, opts: { ...opts, name } });
+    if (type === 'zip') {
+      await download_file({ context, opts: { ...opts, name }, template });
+    }
   });
 
 program.parse(process.argv);

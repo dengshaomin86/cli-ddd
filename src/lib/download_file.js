@@ -4,12 +4,13 @@ const request = require('request');
 const compressing = require('compressing');
 const { log } = require('../util/log');
 const { delete_file, move_project_file } = require('../util/handle_file');
-const { zip_file } = require('../config.js');
-const { url, filename } = zip_file;
 
 // 下载文件
-async function download_file({ context, opts }) {
+async function download_file({ context, opts, template }) {
   log.info('开始下载模板');
+  const { url } = template;
+  if (!url) return false;
+  const filename = '_template.zip';
   const zip_file_path = path.join(context, filename);
   const stream = fs.createWriteStream(zip_file_path);
   request(url)
