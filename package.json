@@ -1,20 +1,46 @@
 {
   "name": "cli-ddd",
-  "version": "0.0.2",
+  "version": "1.0.0",
   "description": "cli-ddd",
-  "main": "index.js",
+  "main": "dist/index.cjs.js",
+  "types": "dist/types/index.d.ts",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "rollup -c -w --bundleConfigAsCjs",
+    "dev": "rollup -c -w",
+    "clean:dist": "rimraf dist",
+    "build:types": "npm run clean:dist && tsc -b ./tsconfig.types.json",
+    "build": "npm run build:types && rollup -c --bundleConfigAsCjs"
   },
   "bin": {
-    "cli-ddd": "src/main.js"
+    "cli-ddd": "dist/index.cjs.js"
   },
   "keywords": [
     "cli-ddd",
     "cli"
   ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/dengshaomin86/cli-ddd.git"
+  },
+  "homepage": "https://github.com/dengshaomin86/cli-ddd",
+  "bugs": "https://github.com/dengshaomin86/cli-ddd/issues",
   "author": "M1n90",
   "license": "ISC",
+  "devDependencies": {
+    "@babel/core": "^7.24.6",
+    "@babel/plugin-proposal-class-properties": "^7.18.6",
+    "@babel/preset-env": "^7.24.6",
+    "@rollup/plugin-babel": "^6.0.4",
+    "@rollup/plugin-json": "^6.1.0",
+    "@types/fs-extra": "^11.0.4",
+    "@types/inquirer": "^9.0.7",
+    "@types/mime-types": "^2.1.4",
+    "rimraf": "^5.0.7",
+    "rollup": "^4.18.0",
+    "rollup-plugin-typescript2": "^0.36.0",
+    "tslib": "^2.6.2",
+    "typescript": "^5.4.5"
+  },
   "dependencies": {
     "chalk": "^4.1.1",
     "commander": "^7.2.0",
