@@ -1,5 +1,6 @@
 import fs from 'fs-extra';
 import https from 'https';
+import logger from '../libs/logger';
 import { htmlparse } from '../libs/htmlparse';
 
 /**
@@ -41,15 +42,32 @@ export const getBranches = (url: string) => {
   });
 };
 
-export const getBranchesFromJson = async (url: string) => {
-  return await fetch(`${url}/list.json`)
-    .then(async (res) => {
-      const list: string[] = await res.json();
-      return list.map((name) => {
-        return { name, type: 'zip', value: `${url}/${name}.zip` };
+export const getBranchesFromJson = (url: string) => {
+  return new Promise<{ name: string; type: string; value: string }[]>((resolve) => {
+    const req = https
+      .get(`${url}/list.json`, (res) => {
+        if (res.statusCode !== 200) {
+          logger.error(`code: ${res.statusCode}`);
+          resolve([]);
+          return;
+        }
+
+        let chunks = '';
+        res.on('data', (chunk: any) => {
+          chunks += chunk;
+        });
+
+        res.on('end', () => {
+          const list: string[] = JSON.parse(chunks);
+          resolve(list.map((name) => ({ name, type: 'zip', value: `${url}/${name}.zip` })));
+        });
+      })
+      .on('error', (err) => {
+        logger.error(err.message);
+        resolve([]);
       });
-    })
-    .catch(() => []);
+    req.end();
+  });
 };
 
 export const download = (url: string, dest: string) => {
@@ -60,6 +78,7 @@ export const download = (url: string, dest: string) => {
         return;
       }
 
+      fs.ensureFileSync(dest);
       const stream = fs.createWriteStream(dest, { autoClose: true });
       stream
         .on('finish', () => {
