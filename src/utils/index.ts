@@ -5,7 +5,7 @@
 import fs from 'fs-extra';
 import path from 'path';
 import compressing from 'compressing';
-import { log } from './log';
+import logger from '../libs/logger';
 
 const TYPES = ['js', 'ts', 'json', 'vue', 'md', 'html', 'css'];
 
@@ -16,16 +16,14 @@ const TYPES = ['js', 'ts', 'json', 'vue', 'md', 'html', 'css'];
  * @returns
  */
 export async function unzipFile(zip_file_path: string, dir: string) {
-  log.info('正在解压文件');
   const result = await compressing.zip
     .uncompress(zip_file_path, dir)
     .then(() => null)
     .catch((err) => err.message);
   if (result) {
-    log.error(result);
+    logger.error(result);
     return false;
   }
-  log.success('文件解压完成');
   // 删除压缩包
   fs.removeSync(zip_file_path);
   return true;

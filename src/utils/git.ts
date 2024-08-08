@@ -1,6 +1,6 @@
 import fs from 'fs-extra';
 import https from 'https';
-import { htmlparse } from './htmlparse';
+import { htmlparse } from '../libs/htmlparse';
 
 /**
  * 获取仓库分支列表
